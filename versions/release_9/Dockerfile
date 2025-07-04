@@ -52,16 +52,16 @@ RUN pecl install xdebug \
 RUN pecl install imagick \
     && docker-php-ext-enable imagick
 
-# Prepare essential directories & permissions
-RUN mkdir -p /var/www/files /var/www/logs \
-    && chown -R www-data:www-data /var/www/html /var/www/files /var/www/logs \
-    && chmod -R 777 /var/www/files /var/www/logs
-
 # Copy application files
 COPY src/ /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Prepare essential directories & permissions
+RUN mkdir -p /var/www/files /var/www/logs \
+    && chown -R www-data:www-data /var/www/html /var/www/files /var/www/logs \
+    && chmod -R 777 /var/www/files /var/www/logs
 
 # Set permissions for all files and directories to ensure security
 RUN find /var/www/html -type d -exec chmod 755 {} \;
