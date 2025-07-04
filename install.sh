@@ -28,6 +28,32 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! [ -d "files" ] || [ "$(stat -c '%G' files)" != "www-data" ] || [ "$(stat -c '%a' files)" != "777" ]; then
+  echo "Error: Directory 'files' must exist with group 'www-data' and permissions '777'."
+  echo "Please run the following commands:"
+  echo "  mkdir -p files"
+  echo "  sudo chown -R $(id -u):$(getent group www-data | cut -d: -f3) files"
+  echo "  sudo chmod -R 777 files"
+  exit 1
+fi
+
+if ! [ -d "logs" ] || [ "$(stat -c '%G' logs)" != "www-data" ] || [ "$(stat -c '%a' logs)" != "777" ]; then
+  echo "Error: Directory 'logs' must exist with group 'www-data' and permissions '777'."
+  echo "Please run the following commands:"
+  echo "  mkdir -p logs"
+  echo "  sudo chown -R $(id -u):$(getent group www-data | cut -d: -f3) logs"
+  echo "  sudo chmod -R 777 logs"
+  exit 1
+fi
+
+if ! [ -d "src" ] || [ "$(stat -c '%G' src)" != "www-data" ]; then
+  echo "Error: Directory 'src' must exist with group 'www-data'."
+  echo "Please run the following commands:"
+  echo "  mkdir -p src"
+  echo "  sudo chown -R $(id -u):$(getent group www-data | cut -d: -f3) src"
+  exit 1
+fi
+
 echo "Building project: $PROJECT_NAME"
 echo "Web Port: $WEB_PORT"
 echo "DB Port: $DB_PORT"
