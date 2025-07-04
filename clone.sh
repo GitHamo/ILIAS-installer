@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# This script clones a specific branch of the ILIAS repository.
-
 BRANCH_NAME=$1
 
 if [ -z "$BRANCH_NAME" ]; then

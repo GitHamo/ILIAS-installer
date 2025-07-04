@@ -2,6 +2,8 @@
 
 This setup provides a quick way to get a local ILIAS development environment running using Docker.
 
+> **Important Note:** This repository is designed to manage a single ILIAS instance. To run multiple instances of ILIAS, you must clone this repository into a separate directory for each instance.
+
 ## Prerequisites
 
 1.  **Docker and Docker Compose:** Ensure you have Docker and Docker Compose (v2) installed on your system.

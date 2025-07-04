@@ -53,10 +53,19 @@ if ! [ -d "logs" ] || [ "$(stat -c '%G' logs)" != "www-data" ] || [ "$(stat -c '
   exit 1
 fi
 
-# Clone the ILIAS repository
 if ! ./clone.sh "$BRANCH_NAME"; then
   echo "Error: Failed to clone the ILIAS repository."
   exit 1
+fi
+
+if [ -d "versions/shared" ]; then
+    echo "Copying shared files..."
+    cp -rf versions/shared/* .
+fi
+
+if [ -d "versions/$BRANCH_NAME" ]; then
+    echo "Copying branch-specific files for $BRANCH_NAME..."
+    cp -rf "versions/$BRANCH_NAME/"* .
 fi
 
 echo "Building project: $PROJECT_NAME"
