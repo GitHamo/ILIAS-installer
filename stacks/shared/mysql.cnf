@@ -1,0 +1,15 @@
+[client]
+default-character-set = utf8
+
+[mysql]
+default-character-set = utf8
+
+[mysqld]
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+
+# Compatibility & SQL Mode
+sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+
+# Network
+bind-address = 0.0.0.0
