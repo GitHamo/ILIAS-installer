@@ -71,6 +71,7 @@ docker compose --env-file .env -p "$PROJECT_NAME" up -d
 container_id=$(docker ps -q -f name=${PROJECT_NAME}-web)
 
 docker exec $container_id composer install --no-dev --classmap-authoritative
+docker exec $container_id npm clean-install --omit=dev --ignore-scripts
 
 if ! docker exec $container_id php setup/cli.php build-artifacts --yes; then
   echo "Artifact build failed."
