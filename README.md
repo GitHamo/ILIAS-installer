@@ -9,15 +9,9 @@ This setup provides a quick way to get a local ILIAS development environment run
 1.  **Docker and Docker Compose:** Ensure you have Docker and Docker Compose (v2) installed on your system.
 
 2.  **Directory Setup:**
-    The installation script requires `files` and `logs` directories to be present in the project root. The script will check for their existence and permissions and will provide instructions if they are not set up correctly.
+    The `install.sh` script automatically creates the `files` and `logs` directories if they don't exist. It also sets the required ownership (`www-data:www-data`) and permissions.
 
-    To create them manually:
-    ```bash
-    mkdir -p files logs
-    sudo chown -R $(id -u):www-data files logs
-    sudo chmod -R 777 files logs
-    ```
-    *(Note: The `www-data` group must exist on your system.)*
+    *(Note: The `www-data` user and group must exist on your system.)*
 
 3.  **Supported ILIAS Versions:**
     The `versions` directory contains configurations for each supported ILIAS branch. Before running the installation, ensure a subdirectory exists for the branch you wish to install (e.g., `versions/release_9`). This structure allows for different configurations per version.
@@ -33,10 +27,10 @@ The `install.sh` script automates the entire setup process. Here’s what it doe
 
 ### How to Run the Installer
 
-Execute the `install.sh` script from your terminal with the following arguments:
+The script requires `sudo` privileges to manage directories and permissions. Execute the `install.sh` script from your terminal with the following arguments:
 
 ```bash
-./install.sh <project_name> <branch_name> [web_port] [db_port]
+sudo ./install.sh <project_name> <branch_name> [web_port] [db_port]
 ```
 
 **Arguments:**

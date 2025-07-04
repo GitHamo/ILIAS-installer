@@ -5,6 +5,11 @@ BRANCH_NAME=$2
 WEB_PORT=$3
 DB_PORT=$4
 
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root or with sudo."
+  exit 1
+fi
+
 if [ -z "$PROJECT_NAME" ]; then
   echo "Error: Missing required project name as first argument."
   echo "Usage: ./install.sh <project_name> <branch_name> [web_port] [db_port]"
@@ -35,22 +40,14 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! [ -d "files" ] || [ "$(stat -c '%U' files)" != "www-data" ] || [ "$(stat -c '%G' files)" != "www-data" ] || [ "$(stat -c '%a' files)" != "777" ]; then
-  echo "Error: Directory 'files' must exist with user and group 'www-data' and permissions '777'."
-  echo "Please run the following commands:"
-  echo "  mkdir -p files"
-  echo "  sudo chown -R www-data:www-data files"
-  echo "  sudo chmod -R 777 files"
-  exit 1
+if ! getent group www-data >/dev/null 2>&1; then
+    echo "Group 'www-data' not found. Please create it."
+    exit 1
 fi
 
-if ! [ -d "logs" ] || [ "$(stat -c '%U' logs)" != "www-data" ] || [ "$(stat -c '%G' logs)" != "www-data" ] || [ "$(stat -c '%a' logs)" != "777" ]; then
-  echo "Error: Directory 'logs' must exist with user and group 'www-data' and permissions '777'."
-  echo "Please run the following commands:"
-  echo "  mkdir -p logs"
-  echo "  sudo chown -R www-data:www-data logs"
-  echo "  sudo chmod -R 777 logs"
-  exit 1
+if ! id -u www-data >/dev/null 2>&1; then
+    echo "User 'www-data' not found. Please create it."
+    exit 1
 fi
 
 if ! ./clone.sh "$BRANCH_NAME"; then
@@ -67,6 +64,15 @@ if [ -d "versions/$BRANCH_NAME" ]; then
     echo "Copying branch-specific files for $BRANCH_NAME..."
     cp -rf "versions/$BRANCH_NAME/"* .
 fi
+
+echo "Preparing 'files' and 'logs' directories..."
+for dir in files logs; do
+    if [ -d "$dir" ]; then
+        echo "Cleaning up existing '$dir' directory..."
+        rm -rf "$dir"/*
+    fi
+    mkdir -p "$dir"
+done
 
 echo "Building project: $PROJECT_NAME"
 echo "Web Port: $WEB_PORT"
@@ -95,5 +101,9 @@ if ! docker exec $container_id php setup/setup.php install --yes /var/www/config
   echo "Setup script failed."
   exit 1
 fi
+
+echo "Setting ownership and permissions for 'files' and 'logs' directories..."
+chown -R www-data:www-data files logs
+chmod -R 777 files logs
 
 echo "Installation complete! Run ILIAS at http://localhost:${WEB_PORT}"
