@@ -102,8 +102,10 @@ if ! docker exec $container_id php setup/setup.php install --yes /var/www/config
   exit 1
 fi
 
-echo "Setting ownership and permissions for 'files' and 'logs' directories..."
-chown -R www-data:www-data files logs
+echo "Setting ownership and permissions for mount directories..."
+chown -R www-data:www-data files logs src
 chmod -R 777 files logs
+find src -type d -exec chmod 755 {} \;
+find src -type f -exec chmod 644 {} \;
 
 echo "Installation complete! Run ILIAS at http://localhost:${WEB_PORT}"
