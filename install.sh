@@ -35,20 +35,20 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! [ -d "files" ] || [ "$(stat -c '%G' files)" != "www-data" ] || [ "$(stat -c '%a' files)" != "777" ]; then
-  echo "Error: Directory 'files' must exist with group 'www-data' and permissions '777'."
+if ! [ -d "files" ] || [ "$(stat -c '%U' files)" != "www-data" ] || [ "$(stat -c '%G' files)" != "www-data" ] || [ "$(stat -c '%a' files)" != "777" ]; then
+  echo "Error: Directory 'files' must exist with user and group 'www-data' and permissions '777'."
   echo "Please run the following commands:"
   echo "  mkdir -p files"
-  echo "  sudo chown -R $(id -u):$(getent group www-data | cut -d: -f3) files"
+  echo "  sudo chown -R www-data:www-data files"
   echo "  sudo chmod -R 777 files"
   exit 1
 fi
 
-if ! [ -d "logs" ] || [ "$(stat -c '%G' logs)" != "www-data" ] || [ "$(stat -c '%a' logs)" != "777" ]; then
-  echo "Error: Directory 'logs' must exist with group 'www-data' and permissions '777'."
+if ! [ -d "logs" ] || [ "$(stat -c '%U' logs)" != "www-data" ] || [ "$(stat -c '%G' logs)" != "www-data" ] || [ "$(stat -c '%a' logs)" != "777" ]; then
+  echo "Error: Directory 'logs' must exist with user and group 'www-data' and permissions '777'."
   echo "Please run the following commands:"
   echo "  mkdir -p logs"
-  echo "  sudo chown -R $(id -u):$(getent group www-data | cut -d: -f3) logs"
+  echo "  sudo chown -R www-data:www-data logs"
   echo "  sudo chmod -R 777 logs"
   exit 1
 fi
