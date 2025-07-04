@@ -1,23 +1,58 @@
-### Prerequisites
+# ILIAS Docker Development Environment
 
-#### Make sure to have empty `files`, `logs` directories in the same root for the bash script `install.sh`.
+This setup provides a quick way to get a local ILIAS development environment running using Docker.
+
+## Prerequisites
+
+1.  **Docker and Docker Compose:** Ensure you have Docker and Docker Compose (v2) installed on your system.
+
+2.  **Directory Setup:**
+    The installation script requires `files` and `logs` directories to be present in the project root. The script will check for their existence and permissions and will provide instructions if they are not set up correctly.
+
+    To create them manually:
+    ```bash
+    mkdir -p files logs
+    sudo chown -R $(id -u):www-data files logs
+    sudo chmod -R 777 files logs
+    ```
+    *(Note: The `www-data` group must exist on your system.)*
+
+3.  **Supported ILIAS Versions:**
+    The `versions` directory contains configurations for each supported ILIAS branch. Before running the installation, ensure a subdirectory exists for the branch you wish to install (e.g., `versions/release_9`). This structure allows for different configurations per version.
+
+## Installation
+
+The `install.sh` script automates the entire setup process. Here’s what it does and how to use it.
+
+### Key Features for Developers
+
+*   **Live Code Reloading:** The script clones the ILIAS repository into the `src` directory, which is directly mounted into the web server container. Any code changes you make in `src` are instantly reflected in your running ILIAS instance without needing to rebuild the container.
+*   **Debugging Ready:** Xdebug is enabled by default and listens on port `9003`, allowing you to connect a step debugger for easier development.
+
+### How to Run the Installer
+
+Execute the `install.sh` script from your terminal with the following arguments:
 
 ```bash
-mkdir -p files logs
-sudo chown -R 1000:33 files logs
-sudo chmod -R 777 files logs
+./install.sh <project_name> <branch_name> [web_port] [db_port]
 ```
 
-#### Import desired ILIAS branch from [GitHub Repository](https://github.com/ILIAS-eLearning/ILIAS) in directory called `src`.
+**Arguments:**
+*   `<project_name>`: A unique name for your project (e.g., `myilias`).
+*   `<branch_name>`: The ILIAS branch you want to install (e.g., `release_9`).
+*   `[web_port]`: (Optional) The local port to access the ILIAS web interface. Defaults to `80`.
+*   `[db_port]`: (Optional) The local port for the database. Defaults to `3306`.
 
-Example:
+### Example Usage
+
+This command sets up a project named `myilias` using the `release_9` branch, with the web server on port `8080` and the database on port `3307`.
+
 ```bash
-git clone -b release_9 https://github.com/ILIAS-eLearning/ILIAS.git src
+./install.sh myilias release_9 8080 3307
 ```
 
-### To install ILIAS run
+> **Note:** While the ports are optional, specifying them is highly encouraged. This allows you to run multiple, different ILIAS versions simultaneously on your local machine without port conflicts.
 
-```bash
-./install.sh <project_name> <web_port> <db_port>
-```
+### Accessing Your ILIAS Instance
 
+Once the script is complete, you can access your ILIAS instance at `http://localhost:<web_port>`.

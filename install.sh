@@ -1,12 +1,19 @@
 #!/bin/bash
 
 PROJECT_NAME=$1
-WEB_PORT=$2
-DB_PORT=$3
+BRANCH_NAME=$2
+WEB_PORT=$3
+DB_PORT=$4
 
 if [ -z "$PROJECT_NAME" ]; then
   echo "Error: Missing required project name as first argument."
-  echo "Usage: ./install.sh <project_name>"
+  echo "Usage: ./install.sh <project_name> <branch_name> [web_port] [db_port]"
+  exit 1
+fi
+
+if [ -z "$BRANCH_NAME" ]; then
+  echo "Error: Missing required branch name as second argument."
+  echo "Usage: ./install.sh <project_name> <branch_name> [web_port] [db_port]"
   exit 1
 fi
 
@@ -46,11 +53,9 @@ if ! [ -d "logs" ] || [ "$(stat -c '%G' logs)" != "www-data" ] || [ "$(stat -c '
   exit 1
 fi
 
-if ! [ -d "src" ] || [ "$(stat -c '%G' src)" != "www-data" ]; then
-  echo "Error: Directory 'src' must exist with group 'www-data'."
-  echo "Please run the following commands:"
-  echo "  mkdir -p src"
-  echo "  sudo chown -R $(id -u):$(getent group www-data | cut -d: -f3) src"
+# Clone the ILIAS repository
+if ! ./clone.sh "$BRANCH_NAME"; then
+  echo "Error: Failed to clone the ILIAS repository."
   exit 1
 fi
 
@@ -71,7 +76,6 @@ docker compose --env-file .env -p "$PROJECT_NAME" up -d
 container_id=$(docker ps -q -f name=${PROJECT_NAME}-web)
 
 docker exec $container_id composer install --no-dev --classmap-authoritative
-docker exec $container_id npm clean-install --omit=dev --ignore-scripts
 
 if ! docker exec $container_id php setup/cli.php build-artifacts --yes; then
   echo "Artifact build failed."
